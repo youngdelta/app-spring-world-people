@@ -79,4 +79,10 @@ public class PopulationApiController {
         populationService.deleteCountry(countryCode);
         return ResponseEntity.noContent().build();
     }
+    
+    @GetMapping("/history/{countryCode}")
+    public ResponseEntity<List<Map<String, Object>>> getPopulationHistory(
+            @PathVariable String countryCode) {
+        return ResponseEntity.ok(populationService.getPopulationHistory(countryCode));
+    }
 }

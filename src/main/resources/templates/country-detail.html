@@ -6,6 +6,10 @@
     <title th:text="${country.countryName} + ' - 세계 인구 대시보드'">
       국가 상세
     </title>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
     <style>
       * {
         margin: 0;
@@ -360,6 +364,55 @@
         font-size: 48px;
         margin-bottom: 15px;
       }
+
+      /* 차트 관련 스타일 */
+      .chart-container {
+        position: relative;
+        height: 400px;
+        margin-top: 20px;
+      }
+
+      .chart-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #e0e0e0;
+      }
+
+      .chart-tab {
+        padding: 10px 20px;
+        background: transparent;
+        border: none;
+        border-bottom: 3px solid transparent;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        color: #666;
+        transition: all 0.3s;
+      }
+
+      .chart-tab:hover {
+        color: #667eea;
+      }
+
+      .chart-tab.active {
+        color: #667eea;
+        border-bottom-color: #667eea;
+      }
+
+      .chart-info {
+        background: #f0f4ff;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 15px;
+        border-left: 4px solid #667eea;
+      }
+
+      .chart-info p {
+        margin: 0;
+        color: #555;
+        font-size: 14px;
+      }
     </style>
   </head>
   <body>
@@ -459,6 +512,31 @@
               대륙 보기 →
             </a>
           </div>
+        </div>
+      </div>
+
+      <!-- 인구 변화 그래프 -->
+      <div class="section">
+        <h2>📊 인구 변화 추이</h2>
+
+        <div class="chart-info">
+          <p>📅 최근 연도별 인구 변화와 성장률을 확인할 수 있습니다.</p>
+        </div>
+
+        <div class="chart-tabs">
+          <button class="chart-tab active" onclick="switchChart('population')">
+            인구 추이
+          </button>
+          <button class="chart-tab" onclick="switchChart('growth')">
+            성장률
+          </button>
+          <button class="chart-tab" onclick="switchChart('combined')">
+            복합 차트
+          </button>
+        </div>
+
+        <div class="chart-container">
+          <canvas id="populationChart"></canvas>
         </div>
       </div>
 
@@ -622,8 +700,6 @@
           </div>
         </div>
       </div>
-
-      <!-- 추가 정보 -->
       <div class="section">
         <h2>ℹ️ 추가 정보</h2>
         <p style="color: #666; line-height: 1.8">
@@ -727,6 +803,9 @@
 
         // 뉴스 로드
         loadNews();
+
+        // 인구 변화 그래프 로드
+        loadPopulationChart();
       });
 
       // 뉴스 API 호출
@@ -802,6 +881,382 @@
           .join("");
 
         newsContainer.innerHTML = `<div class="news-grid">${newsHTML}</div>`;
+      }
+
+      // Chart.js 인스턴스 저장
+      let populationChartInstance = null;
+
+      // 인구 변화 데이터 로드 및 차트 생성
+      async function loadPopulationChart() {
+        // const countryCode = document.querySelector(".country-code").textContent;
+        const countryCode = document.querySelector(
+          ".country-country-code"
+        ).textContent;
+
+        try {
+          // 서버에서 인구 변화 데이터 가져오기
+          const response = await fetch(
+            `/api/population/history/${countryCode}`
+          );
+
+          if (!response.ok) {
+            throw new Error("데이터를 불러올 수 없습니다");
+          }
+
+          const historyData = await response.json();
+
+          // 차트 생성
+          createPopulationChart(historyData);
+        } catch (error) {
+          console.error("인구 데이터 로딩 오류:", error);
+          // 샘플 데이터 사용
+          createPopulationChart(getSampleHistoryData());
+        }
+      }
+
+      // 샘플 인구 변화 데이터
+      function getSampleHistoryData() {
+        return [
+          { year: 2018, population: 51630000, growthRate: 0.15 },
+          { year: 2019, population: 51710000, growthRate: 0.16 },
+          { year: 2020, population: 51780579, growthRate: 0.09 },
+          { year: 2021, population: 51815810, growthRate: 0.07 },
+          { year: 2022, population: 51628117, growthRate: -0.36 },
+          { year: 2023, population: 51784059, growthRate: 0.3 },
+        ];
+      }
+
+      // 차트 생성
+      function createPopulationChart(data) {
+        const ctx = document.getElementById("populationChart").getContext("2d");
+
+        // 기존 차트 제거
+        if (populationChartInstance) {
+          populationChartInstance.destroy();
+        }
+
+        // 데이터 준비
+        const years = data.map((d) => d.year);
+        const populations = data.map((d) => d.population);
+        const growthRates = data.map((d) => d.growthRate);
+
+        // 차트 생성
+        populationChartInstance = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: years,
+            datasets: [
+              {
+                label: "인구 (명)",
+                data: populations,
+                borderColor: "#667eea",
+                backgroundColor: "rgba(102, 126, 234, 0.1)",
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                pointBackgroundColor: "#667eea",
+                pointBorderColor: "#fff",
+                pointBorderWidth: 2,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: true,
+                position: "top",
+                labels: {
+                  font: {
+                    size: 14,
+                    weight: "bold",
+                  },
+                  padding: 20,
+                },
+              },
+              tooltip: {
+                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                padding: 12,
+                titleFont: {
+                  size: 14,
+                  weight: "bold",
+                },
+                bodyFont: {
+                  size: 13,
+                },
+                callbacks: {
+                  label: function (context) {
+                    let label = context.dataset.label || "";
+                    if (label) {
+                      label += ": ";
+                    }
+                    label += context.parsed.y.toLocaleString();
+                    return label;
+                  },
+                },
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: false,
+                ticks: {
+                  callback: function (value) {
+                    return value.toLocaleString();
+                  },
+                  font: {
+                    size: 12,
+                  },
+                },
+                grid: {
+                  color: "rgba(0, 0, 0, 0.05)",
+                },
+              },
+              x: {
+                ticks: {
+                  font: {
+                    size: 12,
+                    weight: "bold",
+                  },
+                },
+                grid: {
+                  display: false,
+                },
+              },
+            },
+          },
+        });
+
+        // 전역 변수에 데이터 저장 (차트 전환용)
+        window.chartData = { years, populations, growthRates };
+      }
+
+      // 차트 타입 전환
+      function switchChart(type) {
+        // 탭 활성화 상태 변경
+        document.querySelectorAll(".chart-tab").forEach((tab) => {
+          tab.classList.remove("active");
+        });
+        event.target.classList.add("active");
+
+        if (!window.chartData) return;
+
+        const { years, populations, growthRates } = window.chartData;
+        const ctx = document.getElementById("populationChart").getContext("2d");
+
+        // 기존 차트 제거
+        if (populationChartInstance) {
+          populationChartInstance.destroy();
+        }
+
+        // 차트 타입에 따라 다른 설정
+        let chartConfig = {};
+
+        if (type === "population") {
+          // 인구 추이 차트
+          chartConfig = {
+            type: "line",
+            data: {
+              labels: years,
+              datasets: [
+                {
+                  label: "인구 (명)",
+                  data: populations,
+                  borderColor: "#667eea",
+                  backgroundColor: "rgba(102, 126, 234, 0.1)",
+                  borderWidth: 3,
+                  fill: true,
+                  tension: 0.4,
+                  pointRadius: 5,
+                  pointHoverRadius: 7,
+                },
+              ],
+            },
+            options: getChartOptions("인구"),
+          };
+        } else if (type === "growth") {
+          // 성장률 차트
+          chartConfig = {
+            type: "bar",
+            data: {
+              labels: years,
+              datasets: [
+                {
+                  label: "성장률 (%)",
+                  data: growthRates,
+                  backgroundColor: growthRates.map((rate) =>
+                    rate >= 0
+                      ? "rgba(72, 187, 120, 0.7)"
+                      : "rgba(245, 101, 101, 0.7)"
+                  ),
+                  borderColor: growthRates.map((rate) =>
+                    rate >= 0 ? "#48bb78" : "#f56565"
+                  ),
+                  borderWidth: 2,
+                },
+              ],
+            },
+            options: getChartOptions("성장률"),
+          };
+        } else if (type === "combined") {
+          // 복합 차트 (인구 + 성장률)
+          chartConfig = {
+            type: "line",
+            data: {
+              labels: years,
+              datasets: [
+                {
+                  label: "인구 (명)",
+                  data: populations,
+                  borderColor: "#667eea",
+                  backgroundColor: "rgba(102, 126, 234, 0.1)",
+                  borderWidth: 3,
+                  fill: true,
+                  tension: 0.4,
+                  yAxisID: "y",
+                },
+                {
+                  label: "성장률 (%)",
+                  data: growthRates,
+                  borderColor: "#48bb78",
+                  backgroundColor: "rgba(72, 187, 120, 0.1)",
+                  borderWidth: 2,
+                  fill: false,
+                  tension: 0.4,
+                  yAxisID: "y1",
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              interaction: {
+                mode: "index",
+                intersect: false,
+              },
+              plugins: {
+                legend: {
+                  display: true,
+                  position: "top",
+                },
+                tooltip: {
+                  backgroundColor: "rgba(0, 0, 0, 0.8)",
+                  padding: 12,
+                },
+              },
+              scales: {
+                y: {
+                  type: "linear",
+                  display: true,
+                  position: "left",
+                  ticks: {
+                    callback: function (value) {
+                      return value.toLocaleString();
+                    },
+                  },
+                },
+                y1: {
+                  type: "linear",
+                  display: true,
+                  position: "right",
+                  grid: {
+                    drawOnChartArea: false,
+                  },
+                  ticks: {
+                    callback: function (value) {
+                      return value + "%";
+                    },
+                  },
+                },
+                x: {
+                  grid: {
+                    display: false,
+                  },
+                },
+              },
+            },
+          };
+        }
+
+        populationChartInstance = new Chart(ctx, chartConfig);
+      }
+
+      // 차트 옵션 생성 함수
+      function getChartOptions(type) {
+        return {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: "top",
+              labels: {
+                font: {
+                  size: 14,
+                  weight: "bold",
+                },
+                padding: 20,
+              },
+            },
+            tooltip: {
+              backgroundColor: "rgba(0, 0, 0, 0.8)",
+              padding: 12,
+              titleFont: {
+                size: 14,
+                weight: "bold",
+              },
+              bodyFont: {
+                size: 13,
+              },
+              callbacks: {
+                label: function (context) {
+                  let label = context.dataset.label || "";
+                  if (label) {
+                    label += ": ";
+                  }
+                  if (type === "성장률") {
+                    label += context.parsed.y + "%";
+                  } else {
+                    label += context.parsed.y.toLocaleString();
+                  }
+                  return label;
+                },
+              },
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: type === "성장률" ? true : false,
+              ticks: {
+                callback: function (value) {
+                  if (type === "성장률") {
+                    return value + "%";
+                  }
+                  return value.toLocaleString();
+                },
+                font: {
+                  size: 12,
+                },
+              },
+              grid: {
+                color: "rgba(0, 0, 0, 0.05)",
+              },
+            },
+            x: {
+              ticks: {
+                font: {
+                  size: 12,
+                  weight: "bold",
+                },
+              },
+              grid: {
+                display: false,
+              },
+            },
+          },
+        };
       }
     </script>
   </body>
