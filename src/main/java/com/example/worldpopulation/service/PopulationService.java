@@ -17,9 +17,11 @@ public class PopulationService {
     private final CountryPopulationMapper countryMapper;
 
     public PageInfo<CountryPopulation> getAllCountries(int pageNum, int pageSize) {
-        PageHelper.startPage(pageNum, pageSize);
-        List<CountryPopulation> countries = countryMapper.findAll();
-        return new PageInfo<>(countries);
+        // PageHelper.startPage(pageNum, pageSize);
+        // List<CountryPopulation> countries = countryMapper.findAll();
+        
+        // return new PageInfo<>(countries);
+        return PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(()->countryMapper.findAll());
     }
 
     public CountryPopulation getCountryByCode(String countryCode) {
