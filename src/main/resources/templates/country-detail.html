@@ -260,6 +260,106 @@
           grid-template-columns: 1fr;
         }
       }
+
+      /* 뉴스 관련 스타일 */
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        margin: 0 auto 15px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .news-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 20px;
+      }
+
+      .news-card {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        border-left: 4px solid #667eea;
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
+      }
+
+      .news-card:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .news-card h3 {
+        color: #333;
+        font-size: 18px;
+        margin-bottom: 10px;
+        line-height: 1.4;
+      }
+
+      .news-card h3 a {
+        color: #333;
+        text-decoration: none;
+        transition: color 0.3s;
+      }
+
+      .news-card h3 a:hover {
+        color: #667eea;
+      }
+
+      .news-description {
+        color: #666;
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 15px;
+      }
+
+      .news-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        color: #999;
+      }
+
+      .news-source {
+        font-weight: 600;
+        color: #667eea;
+      }
+
+      .news-date {
+        color: #999;
+      }
+
+      .news-image {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        border-radius: 5px;
+        margin-bottom: 15px;
+      }
+
+      .no-news {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+      }
+
+      .no-news-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+      }
     </style>
   </head>
   <body>
@@ -555,6 +655,17 @@
         </p>
       </div>
 
+      <!-- 관련 뉴스 -->
+      <div class="section">
+        <h2>📰 관련 뉴스</h2>
+        <div id="newsContainer">
+          <div style="text-align: center; padding: 40px; color: #999">
+            <div class="loading-spinner"></div>
+            <p>뉴스를 불러오는 중...</p>
+          </div>
+        </div>
+      </div>
+
       <!-- 관련 링크 -->
       <div class="section">
         <h2>🔗 관련 정보</h2>
@@ -613,7 +724,85 @@
             card.style.transform = "translateY(0)";
           }, index * 100);
         });
+
+        // 뉴스 로드
+        loadNews();
       });
+
+      // 뉴스 API 호출
+      async function loadNews() {
+        const countryName = document.querySelector(".country-name").textContent;
+        const newsContainer = document.getElementById("newsContainer");
+
+        try {
+          // 서버 API 호출
+          const response = await fetch(
+            `/api/news/country/${encodeURIComponent(countryName)}`
+          );
+
+          if (!response.ok) {
+            throw new Error("뉴스를 불러올 수 없습니다");
+          }
+
+          const articles = await response.json();
+          displayNews(articles);
+        } catch (error) {
+          console.error("뉴스 로딩 오류:", error);
+          newsContainer.innerHTML = `
+                    <div class="no-news">
+                        <div class="no-news-icon">📰</div>
+                        <p>뉴스를 불러오는데 실패했습니다.</p>
+                        <p style="font-size: 14px; margin-top: 10px;">잠시 후 다시 시도해주세요.</p>
+                    </div>
+                `;
+        }
+      }
+
+      // 뉴스 표시
+      function displayNews(articles) {
+        const newsContainer = document.getElementById("newsContainer");
+
+        if (!articles || articles.length === 0) {
+          newsContainer.innerHTML = `
+                    <div class="no-news">
+                        <div class="no-news-icon">📰</div>
+                        <p>관련 뉴스를 찾을 수 없습니다.</p>
+                    </div>
+                `;
+          return;
+        }
+
+        const newsHTML = articles
+          .slice(0, 6)
+          .map(
+            (article) => `
+                <div class="news-card">
+                    ${
+                      article.image
+                        ? `<img src="${article.image}" alt="${article.title}" class="news-image" onerror="this.style.display='none'">`
+                        : ""
+                    }
+                    <h3>
+                        <a href="${
+                          article.url
+                        }" target="_blank" rel="noopener noreferrer">
+                            ${article.title}
+                        </a>
+                    </h3>
+                    <p class="news-description">${
+                      article.description || "내용 미리보기가 없습니다."
+                    }</p>
+                    <div class="news-meta">
+                        <span class="news-source">${article.source}</span>
+                        <span class="news-date">${article.date}</span>
+                    </div>
+                </div>
+            `
+          )
+          .join("");
+
+        newsContainer.innerHTML = `<div class="news-grid">${newsHTML}</div>`;
+      }
     </script>
   </body>
 </html>

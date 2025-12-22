@@ -10,6 +10,10 @@ spring:
     logger:
       com.example.worldpopulation: DEBUG
 
+  news:
+    api:
+      key: 54231af4271f4926801ba02f75c1285a
+
   datasource:
     # url: jdbc:mysql://localhost:3306/world_population?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     url: jdbc:p6spy:mysql://localhost:3306/world_population?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
