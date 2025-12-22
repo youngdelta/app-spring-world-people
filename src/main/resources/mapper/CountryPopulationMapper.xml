@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.worldpopulation.mapper.CountryPopulationMapper">
+
+    <resultMap id="countryResultMap" type="com.example.worldpopulation.model.CountryPopulation">
+        <id property="id" column="id"/>
+        <result property="countryCode" column="country_code"/>
+        <result property="countryName" column="country_name"/>
+        <result property="continent" column="continent"/>
+        <result property="population" column="population"/>
+        <result property="areaSqKm" column="area_sq_km"/>
+        <result property="populationDensity" column="population_density"/>
+        <result property="gdpPerCapita" column="gdp_per_capita"/>
+        <result property="lifeExpectancy" column="life_expectancy"/>
+        <result property="year" column="year"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="countryResultMap">
+        SELECT * FROM country_population ORDER BY population DESC
+    </select>
+
+    <select id="findByCountryCode" resultMap="countryResultMap">
+        SELECT * FROM country_population WHERE country_code = #{countryCode}
+    </select>
+
+    <select id="findByContinent" resultMap="countryResultMap">
+        SELECT * FROM country_population 
+        WHERE continent = #{continent} 
+        ORDER BY population DESC
+    </select>
+
+    <select id="searchByName" resultMap="countryResultMap">
+        SELECT * FROM country_population 
+        WHERE country_name LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY population DESC
+    </select>
+
+    <select id="getContinentStatistics" resultType="map">
+        SELECT 
+            continent,
+            COUNT(*) as country_count,
+            SUM(population) as total_population,
+            AVG(population) as avg_population,
+            AVG(gdp_per_capita) as avg_gdp,
+            AVG(life_expectancy) as avg_life_expectancy
+        FROM country_population
+        GROUP BY continent
+        ORDER BY total_population DESC
+    </select>
+
+    <select id="getTotalWorldPopulation" resultType="long">
+        SELECT SUM(population) FROM country_population
+    </select>
+
+    <select id="getTopCountriesByPopulation" resultMap="countryResultMap">
+        SELECT * FROM country_population 
+        ORDER BY population DESC 
+        LIMIT #{limit}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO country_population 
+        (country_code, country_name, continent, population, area_sq_km, 
+         population_density, gdp_per_capita, life_expectancy, year)
+        VALUES 
+        (#{countryCode}, #{countryName}, #{continent}, #{population}, #{areaSqKm},
+         #{populationDensity}, #{gdpPerCapita}, #{lifeExpectancy}, #{year})
+    </insert>
+
+    <update id="update">
+        UPDATE country_population
+        SET country_name = #{countryName},
+            continent = #{continent},
+            population = #{population},
+            area_sq_km = #{areaSqKm},
+            population_density = #{populationDensity},
+            gdp_per_capita = #{gdpPerCapita},
+            life_expectancy = #{lifeExpectancy},
+            year = #{year}
+        WHERE country_code = #{countryCode}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM country_population WHERE country_code = #{countryCode}
+    </delete>
+
+</mapper>

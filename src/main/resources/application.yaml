@@ -1,0 +1,151 @@
+# spring:
+#   application:
+#     name: worldpopulation
+
+spring:
+  application:
+    name: world-population-dashboard
+
+  log4j:
+    logger:
+      com.example.worldpopulation: DEBUG
+
+  datasource:
+    # url: jdbc:mysql://localhost:3306/world_population?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:p6spy:mysql://localhost:3306/world_population?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+    username: user1
+    password: user12!@
+    # driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # P6Spy 설정
+  decorator:
+    datasource:
+      p6spy:
+        enable-logging: true
+        multiline: true
+        logging: slf4j
+        tracing:
+          include-parameter-values: true
+
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+
+# MyBatis 설정
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.example.worldpopulation.model
+  configuration:
+    map-underscore-to-camel-case: true
+
+# PageHelper 설정
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
+  auto-dialect: true
+  auto-runtime-dialect: true
+  offset-as-page-num: true
+  row-bounds-with-count: true
+  page-size-zero: true
+
+# JWT 설정
+jwt:
+  secret: az12345!@#$%
+  expiration: 86400000 # 24시간 (밀리초)
+
+# 로깅
+logging:
+  level:
+    com.example.worldpopulation: DEBUG
+    org.springframework.security: DEBUG
+    p6spy: INFO
+    # org.mybatis: INFO
+# # \uc0ac\uc6a9\ud560 DB \uc124\uc815
+# pagehelper.helper-dialect=mysql
+
+# # \ubc94\uc704\ub97c \ub118\uc5b4\uac00\ub294 pageNum\uac00 \ub4e4\uc5b4\uc62c \ub54c \uac00\ub2a5\ud560 \uac12\uc73c\ub85c \ubcc0\uacbd
+# pagehelper.reasonable=true
+# pagehelper.offset-as-page-num=true
+# #pagehelper.row-bounds-with-count=true
+# pagehelper.page-size-zero=true
+# pagehelper.params=pageNum=pageNum;pageSize=pageSize;count=countSql;reasonable=reasonable;pageSizeZero=pageSizeZero
+# #pagehelper.support-methods-arguments=true
+# pagehelper.auto-dialect=true
+# pagehelper.auto-runtime-dialect=true
+# #pagehelper.close-conn=false
+
+# #datasource.driver-class-name=org.postgresql.Driver
+# #datasource.url=jdbc:postgresql://localhost:5432/test
+# #datasource.username=postgres
+# #datasource#.password=hys0605###
+
+# spring.main.allow-circular-references=true
+
+# spring.datasource.hikari.maximum-pool-size=4
+# #spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+# spring.datasource.driver-class-name=com.p6spy.engine.spy.P6SpyDriver
+
+# mybatis.type-aliases-package=web.example.app.domain.model
+# mybatis.type-handlers-package=web.example.app.typehandler
+# mybatis.configuration.map-underscore-to-camel-case=true
+# mybatis.configuration.default-fetch-size=100
+# mybatis.configuration.default-statement-timeout=30
+# mybatis.mapper-locations=classpath:mapper/*.xml
+
+# #log4j.logger.org.mybatis=DEBUG
+# #log4j.logger.java.sql.PreparedStatement=DEBUG
+
+# # thymeleaf \u00ec\u0082\u00ac\u00ec\u009a\u00a9 \u00ec\u0097\u00ac\u00eb\u00b6\u0080
+# spring.thymeleaf.enabled=false
+# # template \u00ea\u00b2\u00bd\u00eb\u00a1\u009c \u00ec\u00a0\u0091\u00eb\u0091\u0090\u00ec\u0082\u00ac
+# spring.thymeleaf.prefix=classpath:/templates/
+# # template \u00ea\u00b2\u00bd\u00eb\u00a1\u009c \u00ec\u00a0\u0091\u00eb\u00af\u00b8\u00ec\u0082\u00ac
+# spring.thymeleaf.suffix=.html
+# # cache \u00ed\u0099\u009c\u00ec\u0084\u00b1\u00ed\u0099\u0094 \u00ec\u0097\u00ac\u00eb\u00b6\u0080, \u00ea\u00b0\u009c\u00eb\u00b0\u009c\u00ed\u0099\u0098\u00ea\u00b2\u00bd\u00ec\u0097\u0090\u00ec\u0084\u009c\u00eb\u008a\u0094 \u00eb\u00b9\u0084 \u00ed\u0099\u009c\u00ec\u0084\u00b1\u00ed\u0099\u0094
+# spring.thymeleaf.cache=false
+# # template \u00ec\u009d\u00b8\u00ec\u00bd\u0094\u00eb\u0094\u00a9
+# spring.thymeleaf.encoding=UTF-8
+# #\u00ea\u00b8\u00b0\u00eb\u00b3\u00b8 template \u00eb\u00aa\u00a8\u00eb\u0093\u009c, TemplateMode\u00ec\u0097\u0090 \u00ec\u00a0\u0095\u00ec\u009d\u0098 (HTML, XML, TEXT, JAVASCRIPT \u00eb\u0093\u00b1)
+# spring.thymeleaf.mode=HTML
+# # \u00eb\u00a0\u008c\u00eb\u008d\u0094\u00eb\u00a7\u0081 \u00ec\u00a0\u0084\u00ec\u0097\u0090 template \u00ec\u00a1\u00b4\u00ec\u009e\u00ac \u00ec\u0097\u00ac\u00eb\u00b6\u0080 \u00ed\u0099\u0095\u00ec\u009d\u00b8
+# spring.thymeleaf.check-template=true
+# # template \u00ec\u009c\u0084\u00ec\u00b9\u0098 \u00ec\u00a1\u00b4\u00ec\u009e\u00ac \u00ec\u0097\u00ac\u00eb\u00b6\u0080 \u00ed\u0099\u0095\u00ec\u009d\u00b8
+# spring.thymeleaf.check-template-location=true
+
+# #spring.thymeleaf.prefix=classpath: templates/
+# #spring.thymeleaf.suffix: .html
+# #spring.thymeleaf.check-template-location: true
+# #spring.thymeleaf.cache=false
+# spring.thymeleaf.mvc.static-path-pattern=/static/**
+
+# spring.log4j.logger.web.example.app=INFO
+
+# ## MULTIPART (MultipartProperties)
+# # Enable multipart uploads
+# spring.servlet.multipart.enabled=true
+
+# # Threshold after which files will be written to disk
+# spring.servlet.multipart.file-size-threshold=1MB
+# # Maximum size of a file
+# spring.servlet.multipart.max-file-size=200MB
+# # Maximum size of a request
+# spring.servlet.multipart.max-request-size=215MB
+
+# # JPA
+# spring.jpa.hibernate.ddl-auto=create
+# # spring.jpa.hibernate.ddl-auto=update
+# spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+# spring.jpa.show-sql=true
+# spring.jpa.generate-ddl=false
+# spring.jpa.database=h2
+
+# # logging.level.org.hibernate.SQL=info
+
+# spring.h2.console.enabled=true
+
