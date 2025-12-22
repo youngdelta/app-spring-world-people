@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>검색 결과 - 세계 인구 대시보드</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #f5f5f5;
+      }
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .header h1 {
+        font-size: 28px;
+      }
+      .back-btn {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.3s;
+      }
+      .back-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+      .container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 0 20px;
+      }
+      .search-header {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .search-header h2 {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 10px;
+      }
+      .search-info {
+        color: #666;
+        font-size: 16px;
+      }
+      .search-keyword {
+        color: #667eea;
+        font-weight: bold;
+      }
+      .search-box {
+        margin-top: 20px;
+      }
+      .search-box input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+      .no-results {
+        background: white;
+        padding: 60px 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+      .no-results h3 {
+        font-size: 32px;
+        color: #999;
+        margin-bottom: 15px;
+      }
+      .no-results p {
+        color: #666;
+        font-size: 16px;
+      }
+      .countries-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+      }
+      .country-card {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+      }
+      .country-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+      }
+      .country-card-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f0f0f0;
+      }
+      .country-flag-card {
+        width: 60px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+      .country-card-title {
+        flex: 1;
+      }
+      .country-card-title h3 {
+        font-size: 20px;
+        color: #333;
+        margin-bottom: 5px;
+      }
+      .country-card-title .code {
+        font-size: 14px;
+        color: #999;
+      }
+      .country-card-title .continent {
+        display: inline-block;
+        padding: 3px 10px;
+        background: #e7e3fc;
+        color: #667eea;
+        border-radius: 12px;
+        font-size: 12px;
+        margin-top: 5px;
+      }
+      .country-card-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .stat-item {
+        padding: 8px;
+        background: #f8f9fa;
+        border-radius: 5px;
+      }
+      .stat-item .label {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 3px;
+      }
+      .stat-item .value {
+        font-size: 16px;
+        font-weight: bold;
+        color: #667eea;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="header-content">
+        <h1>🌍 세계 인구 대시보드</h1>
+        <a href="/dashboard" class="back-btn">← 대시보드로 돌아가기</a>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="search-header">
+        <h2>🔍 검색 결과</h2>
+        <p class="search-info">
+          <span
+            class="search-keyword"
+            th:text="'&quot;' + ${keyword} + '&quot;'"
+            >검색어</span
+          >에 대한 <strong th:text="${countries.size()}">5</strong>개의 결과를
+          찾았습니다.
+        </p>
+
+        <div class="search-box">
+          <form th:action="@{/search}" method="get">
+            <input
+              type="text"
+              name="keyword"
+              th:value="${keyword}"
+              placeholder="다른 국가명을 검색하세요..."
+              autofocus
+            />
+          </form>
+        </div>
+      </div>
+
+      <!-- 결과가 없을 때 -->
+      <div class="no-results" th:if="${countries.isEmpty()}">
+        <h3>😢 검색 결과가 없습니다</h3>
+        <p>다른 검색어로 다시 시도해보세요.</p>
+      </div>
+
+      <!-- 검색 결과 -->
+      <div class="countries-grid" th:if="${!countries.isEmpty()}">
+        <a
+          th:each="country : ${countries}"
+          th:href="@{/country/{code}(code=${country.countryCode})}"
+          class="country-card"
+        >
+          <div class="country-card-header">
+            <img
+              th:src="'https://flagcdn.com/w80/' + ${#strings.toLowerCase(country.countryCode)} + '.png'"
+              th:alt="${country.countryName}"
+              class="country-flag-card"
+              onerror="this.style.display='none'"
+            />
+            <div class="country-card-title">
+              <h3 th:text="${country.countryName}">대한민국</h3>
+              <span class="code" th:text="${country.countryCode}">KOR</span>
+              <span class="continent" th:text="${country.continent}">Asia</span>
+            </div>
+          </div>
+
+          <div class="country-card-stats">
+            <div class="stat-item">
+              <div class="label">인구</div>
+              <div
+                class="value"
+                th:text="${#numbers.formatInteger(country.population, 0, 'COMMA')}"
+              >
+                51,784,059
+              </div>
+            </div>
+            <div class="stat-item">
+              <div class="label">GDP (1인당)</div>
+              <div
+                class="value"
+                th:text="${'$' + #numbers.formatDecimal(country.gdpPerCapita, 0, 'COMMA', 0, 'POINT')}"
+              >
+                $34,165
+              </div>
+            </div>
+            <div class="stat-item">
+              <div class="label">인구 밀도</div>
+              <div
+                class="value"
+                th:text="${#numbers.formatDecimal(country.populationDensity, 0, 2)}"
+              >
+                516.78
+              </div>
+            </div>
+            <div class="stat-item">
+              <div class="label">기대 수명</div>
+              <div
+                class="value"
+                th:text="${#numbers.formatDecimal(country.lifeExpectancy, 0, 2)}"
+              >
+                83.73
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </body>
+</html>

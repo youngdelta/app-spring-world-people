@@ -98,6 +98,20 @@
       tr:hover {
         background: #f8f9fa;
       }
+      .country-flag-small {
+        width: 32px;
+        height: 21px;
+        object-fit: cover;
+        border-radius: 3px;
+        vertical-align: middle;
+        margin-right: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      }
+      .country-name-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
       .pagination {
         display: flex;
         justify-content: center;
@@ -227,11 +241,19 @@
             <tr th:each="country, iterStat : ${topCountries}">
               <td th:text="${iterStat.count}">1</td>
               <td>
-                <a
-                  th:href="@{/country/{code}(code=${country.countryCode})}"
-                  th:text="${country.countryName}"
-                  >중국</a
-                >
+                <div class="country-name-cell">
+                  <img
+                    th:src="'https://flagcdn.com/w40/' + ${#strings.toLowerCase(country.countryCode)} + '.png'"
+                    th:alt="${country.countryName}"
+                    class="country-flag-small"
+                    onerror="this.style.display='none'"
+                  />
+                  <a
+                    th:href="@{/country/{code}(code=${country.countryCode})}"
+                    th:text="${country.countryName}"
+                    >중국</a
+                  >
+                </div>
               </td>
               <td th:text="${country.continent}">Asia</td>
               <td
@@ -279,11 +301,19 @@
             <tr th:each="country : ${countries}">
               <td th:text="${country.countryCode}">KOR</td>
               <td>
-                <a
-                  th:href="@{/country/{code}(code=${country.countryCode})}"
-                  th:text="${country.countryName}"
-                  >대한민국</a
-                >
+                <div class="country-name-cell">
+                  <img
+                    th:src="'https://flagcdn.com/w40/' + ${#strings.toLowerCase(country.countryCode)} + '.png'"
+                    th:alt="${country.countryName}"
+                    class="country-flag-small"
+                    onerror="this.style.display='none'"
+                  />
+                  <a
+                    th:href="@{/country/{code}(code=${country.countryCode})}"
+                    th:text="${country.countryName}"
+                    >대한민국</a
+                  >
+                </div>
               </td>
               <td th:text="${country.continent}">Asia</td>
               <td

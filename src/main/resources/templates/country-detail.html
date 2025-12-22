@@ -72,8 +72,16 @@
       }
 
       .country-flag {
-        font-size: 80px;
         margin-bottom: 20px;
+      }
+
+      .country-flag img {
+        width: 120px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 5px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        border: 2px solid #e0e0e0;
       }
 
       .country-name {
@@ -265,9 +273,16 @@
     <div class="container">
       <!-- 국가 헤더 -->
       <div class="country-header">
-        <div class="country-flag">🏳️</div>
+        <div class="country-flag">
+          <!-- Flagpedia API 사용 (무료, CDN) -->
+          <img
+            th:src="'https://flagcdn.com/w320/' + ${#strings.toLowerCase(country.countryCode)} + '.png'"
+            th:alt="${country.countryName} + ' 국기'"
+            th:onerror="'this.onerror=null; this.src=\'https://flagcdn.com/w320/un.png\';'"
+          />
+        </div>
         <h1 class="country-name" th:text="${country.countryName}">대한민국</h1>
-        <p class="country-code" th:text="${country.countryCode}">KOR</p>
+        <p class="country-country-code" th:text="${country.countryCode}">KOR</p>
       </div>
 
       <!-- 주요 통계 카드 -->
