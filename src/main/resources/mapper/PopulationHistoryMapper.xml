@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.worldpopulation.mapper.PopulationHistoryMapper">
+
+    <select id="findByCountryCode" resultType="map">
+        SELECT 
+            year,
+            population,
+            growth_rate as growthRate
+        FROM population_history
+        WHERE country_code = #{countryCode}
+        ORDER BY year ASC
+    </select>
+
+    <insert id="insert">
+        INSERT INTO population_history (country_code, year, population, growth_rate)
+        VALUES (#{countryCode}, #{year}, #{population}, #{growthRate})
+    </insert>
+
+</mapper>
