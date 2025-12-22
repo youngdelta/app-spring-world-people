@@ -56,7 +56,7 @@ pagehelper:
 
 # JWT 설정
 jwt:
-  secret: az12345!@#$%
+  secret: fuI0Hrmqsl0YY0dacd08da76da3c545118626fabf90a3445a5e41b7be1908d5aa1316de08952c3rWmUN3xNtgnWgpG2Y7Pooc6UycKQX
   expiration: 86400000 # 24시간 (밀리초)
 
 # 로깅

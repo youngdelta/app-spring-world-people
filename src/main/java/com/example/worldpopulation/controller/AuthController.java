@@ -1,16 +1,21 @@
 package com.example.worldpopulation.controller;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.example.worldpopulation.dto.AuthRequest;
 import com.example.worldpopulation.dto.AuthResponse;
 import com.example.worldpopulation.model.User;
 import com.example.worldpopulation.service.AuthService;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -19,13 +24,17 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    // private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(
             @RequestBody AuthRequest request,
             HttpServletResponse response) {
 
-                log.info("1111111111    @@@@@@@@      AuthRequest: {}", request);
+                
+        // String encodedPassword = passwordEncoder.encode(request.getPassword());
+		// log.info("Encoded Password: {}", encodedPassword);
+
         
         AuthResponse authResponse = authService.authenticate(request);
 
