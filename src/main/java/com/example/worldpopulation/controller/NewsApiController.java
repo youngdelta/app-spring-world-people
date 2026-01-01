@@ -1,5 +1,7 @@
 package com.example.worldpopulation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+@Tag(name = "News", description = "뉴스 관련 API")
 @RestController
 @RequestMapping("/api/news")
 @RequiredArgsConstructor
@@ -28,6 +31,7 @@ public class NewsApiController {
      * @param countryName 국가명
      * @return 뉴스 목록
      */
+    @Operation(summary = "국가별 뉴스 조회", description = "명시된 국가의 최신 뉴스를 조회합니다. API 키가 없는 경우 샘플 데이터를 반환합니다.")
     @GetMapping("/country/{countryName}")
     public ResponseEntity<?> getCountryNews(@PathVariable String countryName) {
         try {

@@ -3,6 +3,7 @@ package com.example.worldpopulation.controller;
 import com.example.worldpopulation.model.CountryPopulation;
 import com.example.worldpopulation.service.PopulationService;
 import com.github.pagehelper.PageInfo;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+@Tag(name = "Dashboard UI", description = "대시보드 화면 관련 컨트롤러 (UI)")
 @Controller
 @RequiredArgsConstructor
 public class DashboardController {
