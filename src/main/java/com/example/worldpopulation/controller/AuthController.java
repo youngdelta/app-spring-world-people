@@ -35,14 +35,7 @@ public class AuthController {
             @RequestBody AuthRequest request,
             HttpServletResponse response) {
 
-                
-        // String encodedPassword = passwordEncoder.encode(request.getPassword());
-		// log.info("Encoded Password: {}", encodedPassword);
-
-        
         AuthResponse authResponse = authService.authenticate(request);
-
-log.info("222222222     @@@@@@@@      AuthResponse: {}", authResponse);
         
         // JWT를 쿠키에 저장
         Cookie cookie = new Cookie("jwt", authResponse.getToken());
