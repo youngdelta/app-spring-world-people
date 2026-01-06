@@ -65,7 +65,7 @@ pagehelper:
 
 # JWT 설정
 jwt:
-  secret: ${JWT_SECRET:defaultSecretKeyFor1DevEnvironmentOnly_ChangeInProduction}
+  secret: ${JWT_SECRET:thisIsADefaultSecretKeyThatIsAtLeast64CharactersLongToSatisfyThe512BitRequirementForHS512Algorithm}
   expiration: 86400000 # 24시간 (밀리초)
 
 # 로깅
