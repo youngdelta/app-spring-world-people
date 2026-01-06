@@ -208,7 +208,7 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import { authAPI, continentAPI, countryAPI } from "../services/api";
+import { authAPI, continentAPI, countryAPI, statsAPI } from "../services/api";
 import {
   formatCurrency,
   formatDecimal,
